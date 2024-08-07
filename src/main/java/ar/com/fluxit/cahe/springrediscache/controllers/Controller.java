@@ -6,7 +6,10 @@ import ar.com.fluxit.cahe.springrediscache.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 public class Controller {
@@ -14,15 +17,17 @@ public class Controller {
     @Autowired
     private ProductService productService;
 
+
     @GetMapping("/product/{id}")
-    public Product getProductById(@PathVariable long id) {
-        return productService.findById(id).orElseThrow( () -> new NotFoundException("No se encontro el producto con el id: " + id));
+    public CompletableFuture<Product> getProductById(@PathVariable long id) {
+        return productService.findById(id);
     }
 
     @DeleteMapping("/product/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeProductById(@PathVariable long id) {
-        var  product =  productService.findById(id).orElseThrow( () -> new NotFoundException("No se encontro el producto con el id: " + id));
-        productService.deleteProduct(product);
+    public CompletableFuture<Void> removeProductById(@PathVariable long id) {
+        return productService.findById(id)
+                .thenApply(p->p)
+                .thenCompose(productService::deleteProduct);
     }
 }

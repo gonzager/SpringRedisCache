@@ -100,7 +100,7 @@ Los endpoint que publica el web server son:
 | Método |Endpoint| comentarios                                                  | 
 |--------|--------|--------------------------------------------------------------|
 | Get    |/product/{id}| Recuera el producto por el id y genera los datos en la chace |
-| Delete |//product/{id}| Borrar la chace y borra el producto de la base de datos      |                
+| Delete |/product/{id}| Borrar la chace y borra el producto de la base de datos      |                
 
 ## Time To Live de la Cache
 Una buena práctica para el almacenamiento en caché es asegurarse de que los datos redundantes y en exceso no se acumulen indefinidamente, ya que esto puede dar como resultado que se entreguen a los usuarios datos obsoletos o desactualizados. Para lograr esto, podemos aprovechar la propiedad de tiempo de vida, que es una configuración opcional que nos permite establecer el tiempo de vencimiento de los datos almacenados en caché. Una vez transcurrido el tiempo especificado, la entrada almacenada en caché se elimina automáticamente de la memoria caché. Esto crea espacio para que se obtengan y almacenen nuevos datos en la memoria caché la próxima vez que se soliciten. Si no se asigna ningún valor a la propiedad, se convierte en -1 de forma predeterminada, lo que significa que los datos permanecerán en la memoria caché indefinidamente
@@ -136,8 +136,11 @@ Utilice anotaciones de almacenamiento en caché en la capa de los servicios para
 ```
     @Cacheable(value = "product", key = "#id", unless="#result == null")
     @Transactional(Transactional.TxType.NEVER)
-    public Optional<Product> findById(Long id) {
-        return productRepository.findById(id);
+    public CompletableFuture<Product> findById(Long id) {
+        return CompletableFuture.supplyAsync(
+                () -> productRepository.findById(id).orElseThrow(
+                        ()->new NotFoundException("No se encontro el producto con el id: " + id))
+        );
     }
 ```
 
@@ -150,8 +153,8 @@ El  atributo value establece una caché con un nombre específico (igual al nomb
 ```
     @CacheEvict(cacheNames = "product", key = "#product.id", beforeInvocation = true)
     @Transactional(Transactional.TxType.REQUIRED)
-    public void deleteProduct(Product product) {
-        productRepository.delete(product);
+    public CompletableFuture<Void> deleteProduct(Product product) {
+        return CompletableFuture.runAsync(() -> productRepository.delete(product));
     }
 ```
 Usamos cacheName y key para eliminar datos específicos de la memoria caché. El beforeInvocation nos permite controlar el proceso de expulsión, lo que nos permite elegir si la expulsión debe ocurrir antes o después de la ejecución del método.
