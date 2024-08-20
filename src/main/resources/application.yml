@@ -3,6 +3,8 @@ spring:
     name: SpringRedisCache
   cache:
     type: redis
+    redis:
+      time-to-live: 36000
   data:
     redis:
       host: localhost

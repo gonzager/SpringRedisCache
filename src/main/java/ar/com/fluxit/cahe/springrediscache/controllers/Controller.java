@@ -26,8 +26,6 @@ public class Controller {
     @DeleteMapping("/product/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public CompletableFuture<Void> removeProductById(@PathVariable long id) {
-        return productService.findById(id)
-                .thenApply(p->p)
-                .thenCompose(productService::deleteProduct);
+        return productService.findById(id).thenCompose(productService::deleteProduct);
     }
 }

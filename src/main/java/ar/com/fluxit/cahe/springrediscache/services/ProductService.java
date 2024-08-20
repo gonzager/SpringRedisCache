@@ -25,8 +25,15 @@ public class ProductService {
     @Transactional(Transactional.TxType.NEVER)
     public CompletableFuture<Product> findById(Long id) {
         return CompletableFuture.supplyAsync(
-                () -> productRepository.findById(id).orElseThrow(
-                        ()->new NotFoundException("No se encontro el producto con el id: " + id))
+                () -> {
+                    try {
+                        Thread.sleep(2500);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return productRepository.findById(id).orElseThrow(
+                            () -> new NotFoundException("No se encontro el producto con el id: " + id));
+                }
         );
     }
 

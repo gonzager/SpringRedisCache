@@ -99,8 +99,8 @@ Los endpoint que publica el web server son:
 
 | Método |Endpoint| comentarios                                                  | 
 |--------|--------|--------------------------------------------------------------|
-| Get    |/product/{id}| Recuera el producto por el id y genera los datos en la chace |
-| Delete |/product/{id}| Borrar la chace y borra el producto de la base de datos      |                
+| Get    |/product/{id}| Recuera el producto por el id y genera los datos en la caché |
+| Delete |/product/{id}| Borrar la caché y borra el producto de la base de datos      |                
 
 ## Time To Live de la Cache
 Una buena práctica para el almacenamiento en caché es asegurarse de que los datos redundantes y en exceso no se acumulen indefinidamente, ya que esto puede dar como resultado que se entreguen a los usuarios datos obsoletos o desactualizados. Para lograr esto, podemos aprovechar la propiedad de tiempo de vida, que es una configuración opcional que nos permite establecer el tiempo de vencimiento de los datos almacenados en caché. Una vez transcurrido el tiempo especificado, la entrada almacenada en caché se elimina automáticamente de la memoria caché. Esto crea espacio para que se obtengan y almacenen nuevos datos en la memoria caché la próxima vez que se soliciten. Si no se asigna ningún valor a la propiedad, se convierte en -1 de forma predeterminada, lo que significa que los datos permanecerán en la memoria caché indefinidamente
